@@ -1,8 +1,9 @@
-function GameManager(size, InputManager, Actuator, ScoreManager) {
+function GameManager(size, InputManager, Actuator, ScoreManager, StatsManager) {
   this.size         = size; // Size of the grid
   this.inputManager = new InputManager;
-  this.scoreManager = new ScoreManager;
+  this.scoreManager = new ScoreManager("bestScore");
   this.actuator     = new Actuator;
+  this.statsManager = new StatsManager;
 
   this.startTiles   = 2;
 
@@ -73,11 +74,12 @@ GameManager.prototype.actuate = function () {
   }
 
   this.actuator.actuate(this.grid, {
-    score:      this.score,
-    over:       this.over,
-    won:        this.won,
-    bestScore:  this.scoreManager.get(),
-    terminated: this.isGameTerminated()
+    score:        this.score,
+    over:         this.over,
+    won:          this.won,
+    bestScore:    this.scoreManager.get(),
+    terminated:   this.isGameTerminated(),
+    statsManager: this.statsManager,
   });
 
 };
@@ -152,7 +154,28 @@ GameManager.prototype.move = function (direction) {
     });
   });
 
-  if (moved) {
+  if (moved)
+  {
+    // ### Statistics ##################################
+    this.statsManager.increase('moves-total')
+    switch (direction)
+    {
+      case 0:
+        this.statsManager.increase('moves-up')
+        break;
+      case 1:
+        this.statsManager.increase('moves-right')
+        break;
+      case 2:
+        this.statsManager.increase('moves-down')
+        break;
+      case 3:
+        this.statsManager.increase('moves-left')
+        break;
+    } //switch
+    // =================================================
+
+
     this.addRandomTile();
 
     if (!this.movesAvailable()) {

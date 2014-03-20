@@ -18,12 +18,15 @@ window.fakeStorage = {
   }
 };
 
-function LocalScoreManager() {
-  this.key     = "bestScore";
+// Constructor:
+function LocalScoreManager(key)
+{
+  this.key      = "bestScore";
+  this.key      = key;
 
   var supported = this.localStorageSupported();
-  this.storage = supported ? window.localStorage : window.fakeStorage;
-}
+  this.storage  = supported ? window.localStorage : window.fakeStorage;
+} //constructor
 
 LocalScoreManager.prototype.localStorageSupported = function () {
   var testKey = "test";
