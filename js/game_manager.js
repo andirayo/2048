@@ -36,12 +36,16 @@ GameManager.prototype.isGameTerminated = function () {
 
 // Set up the game
 GameManager.prototype.setup = function () {
-  this.grid        = new Grid(this.size);
+  this.grid               = new Grid(this.size);
+      
+  this.score              = 0;
+  this.over               = false;
+  this.won                = false;
+  this.keepPlaying        = false;
 
-  this.score       = 0;
-  this.over        = false;
-  this.won         = false;
-  this.keepPlaying = false;
+  // first move is not used for stats
+  this.timestampLastMove  = false; // Date.now();
+  this.timeMoveAverage    = 0;
 
   // Add the initial tiles
   this.addStartTiles();
@@ -110,9 +114,10 @@ GameManager.prototype.move = function (direction) {
 
   var cell, tile;
 
-  var vector     = this.getVector(direction);
-  var traversals = this.buildTraversals(vector);
-  var moved      = false;
+  var vector      = this.getVector(direction);
+  var traversals  = this.buildTraversals(vector);
+  var moved       = false;
+  var tilesMerged = false;
 
   // Save the current tile positions and remove merger information
   this.prepareTiles();
@@ -128,9 +133,15 @@ GameManager.prototype.move = function (direction) {
         var next      = self.grid.cellContent(positions.next);
 
         // Only one merger per row traversal?
-        if (next && next.value === tile.value && !next.mergedFrom) {
-          var merged = new Tile(positions.next, tile.value * 2);
+        if (next && next.value === tile.value && !next.mergedFrom)
+        {
+          var merged  = new Tile(positions.next, tile.value * 2);
           merged.mergedFrom = [tile, next];
+
+          tilesMerged = merged.value;
+          // ### Statistics ##################################
+          self.statsManager.increase('merges-total');
+          self.statsManager.increase('merges-' + merged.value);
 
           self.grid.insertTile(merged);
           self.grid.removeTile(tile);
@@ -157,22 +168,35 @@ GameManager.prototype.move = function (direction) {
   if (moved)
   {
     // ### Statistics ##################################
-    this.statsManager.increase('moves-total')
+    this.statsManager.increase('moves-total');
     switch (direction)
     {
       case 0:
-        this.statsManager.increase('moves-up')
+        this.statsManager.increase('moves-up');
         break;
       case 1:
-        this.statsManager.increase('moves-right')
+        this.statsManager.increase('moves-right');
         break;
       case 2:
-        this.statsManager.increase('moves-down')
+        this.statsManager.increase('moves-down');
         break;
       case 3:
-        this.statsManager.increase('moves-left')
+        this.statsManager.increase('moves-left');
         break;
     } //switch
+
+    if  (! tilesMerged)
+      this.statsManager.increase('moves-nomerge');
+
+    movesTotal  = this.statsManager.get('moves-total');
+    if  (this.timestampLastMove)
+    {
+      var timeLastMove      = (Date.now() - this.timestampLastMove) / 1000;
+      this.timeMoveAverage  = ((timeLastMove + this.timeMoveAverage * (movesTotal -1) ) / movesTotal).toFixed(3);
+
+      this.statsManager.set('time-move-average', this.timeMoveAverage);
+    } //if
+    this.timestampLastMove = Date.now();
     // =================================================
 
 

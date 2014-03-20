@@ -1,11 +1,25 @@
 function LocalStatsManager()
 {
   this.stats_names_and_initials = {
-    'moves-total' : 0,
-    'moves-up'    : 0 ,
-    'moves-down'  : 0,
-    'moves-left'  : 0,
-    'moves-right' : 0,
+    'moves-total'       : 0,
+    'moves-up'          : 0 ,
+    'moves-down'        : 0,
+    'moves-left'        : 0,
+    'moves-right'       : 0,
+    'moves-nomerge'     : 0,
+    'merges-total'      : 0,
+    'merges-4'          : 0,
+    'merges-8'          : 0,
+    'merges-16'         : 0,
+    'merges-32'         : 0,
+    'merges-64'         : 0,
+    'merges-128'        : 0,
+    'merges-256'        : 0,
+    'merges-512'        : 0,
+    'merges-1024'       : 0,
+    'merges-2048'       : 0,
+    'merges-4096'       : 0,
+    'time-move-average' : 0,
     };
 
   this.stats        = new Object();
