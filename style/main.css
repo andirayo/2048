@@ -16,11 +16,13 @@ body {
   clear: both; }
 
 h1.title {
-  font-size: 60px;
+  font-size: 50px;
   font-weight: bold;
   margin: 0;
   display: block;
-  float: left; }
+  float: left;
+  color: #882222;
+}
 
 @-webkit-keyframes move-up {
   0% {
@@ -119,11 +121,11 @@ hr {
   margin-bottom: 30px; }
 
 .container {
-  width   : 840px;
+  width   : 860px;
   margin  : 0 auto;
 }
 .main-container {
-  width   : 500px;
+  width   : 520px;
   margin  : 0 auto;
   float   : left;
 }
@@ -804,7 +806,6 @@ hr {
         .btc-donate .address:after {
           left: 50%;
           bottom: 2px; } }
-    margin-top: 30px !important; } }
 
 .sidebar-container {
   width:        300px;
