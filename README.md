@@ -4,5 +4,5 @@ Added statistics to the game.
 [Play it here!](http://andirayo.github.io/2048stats/)
 
 ## License
-2048stats is licensed under the [MIT license.]
+2048stats is licensed under the [MIT license.](https://github.com/andirayo/2048stats/blob/master/LICENSE.txt)
 
