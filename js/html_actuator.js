@@ -25,6 +25,8 @@ HTMLActuator.prototype.actuate = function (grid, metadata) {
     self.updateScore(metadata.score);
     self.updateBestScore(metadata.bestScore);
 
+    self.updateStats(metadata.statsManager);
+
     if (metadata.terminated) {
       if (metadata.over) {
         self.message(false); // You lose
@@ -128,6 +130,17 @@ HTMLActuator.prototype.updateScore = function (score) {
 HTMLActuator.prototype.updateBestScore = function (bestScore) {
   this.bestContainer.textContent = bestScore;
 };
+
+HTMLActuator.prototype.updateStats = function(statsManager)
+{
+  for (stats_name in statsManager.stats_names_and_initials)
+  {
+    this.statsContainer             = document.querySelector('#stats-' + stats_name);
+    this.clearContainer(this.statsContainer);
+    this.statsContainer.textContent = statsManager.get(stats_name);
+  } //for
+};  //updateStats()
+
 
 HTMLActuator.prototype.message = function (won) {
   var type    = won ? "game-won" : "game-over";
