@@ -48,6 +48,25 @@ GameManager.prototype.setup = function () {
   this.timestampLastMove  = false; // Date.now();
   this.timeMoveAverage    = 0;
 
+  this.folder_data_audio  = 'data/audio/';
+  this.audio_filenames    = {
+       4: 'zipper_with_coins.mp3',
+       8: 'coins_dropping2.mp3',
+      16: 'coin_dropping1.mp3',
+      32: 'checkout.mp3',
+      64: 'charging.mp3',
+     128: 'voice_alright.mp3',
+     256: 'gold_rain.mp3',
+     512: 'voice_halleluja.mp3',
+    1024: 'sirene.mp3',
+    2048: 'slot_machine.mp3',
+    4096: 'dingdingding.mp3',
+    };
+  this.audio_sounds       = new Object();
+  for (key in this.audio_filenames)
+    this.audio_sounds[key]  = new Audio( this.folder_data_audio + this.audio_filenames[key] );
+
+
   // Add the initial tiles
   this.addStartTiles();
 
@@ -143,6 +162,10 @@ GameManager.prototype.move = function (direction) {
           // ### Statistics ##################################
           self.statsManager.increase('merges-total');
           self.statsManager.increase('merges-' + merged.value);
+          // very good: http://www.freesound.org/
+          // also good: http://www.freesfx.co.uk/sfx
+          self.audio_sounds[merged.value].play();
+
 
           self.grid.insertTile(merged);
           self.grid.removeTile(tile);
