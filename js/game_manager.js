@@ -44,6 +44,7 @@ GameManager.prototype.setup = function () {
   this.keepPlaying        = false;
 
   // first move is not used for stats
+  this.timestampGameStart = false;
   this.timestampLastMove  = false; // Date.now();
   this.timeMoveAverage    = 0;
 
@@ -191,12 +192,16 @@ GameManager.prototype.move = function (direction) {
     movesTotal  = this.statsManager.get('moves-total');
     if  (this.timestampLastMove)
     {
-      var timeLastMove      = (Date.now() - this.timestampLastMove) / 1000;
-      this.timeMoveAverage  = ((timeLastMove + this.timeMoveAverage * (movesTotal -1) ) / movesTotal).toFixed(3);
+      var timeLastMove        = (Date.now() - this.timestampLastMove) / 1000;
+      this.timeMoveAverage    = ((timeLastMove + this.timeMoveAverage * (movesTotal -1) ) / movesTotal).toFixed(3);
 
       this.statsManager.set('time-move-average', this.timeMoveAverage);
-    } //if
-    this.timestampLastMove = Date.now();
+    }
+    else
+      this.timestampGameStart = Date.now();
+
+    this.timestampLastMove    = Date.now();
+    this.statsManager.set('time-game-total', ((Date.now() - this.timestampGameStart) / 1000).toFixed(3));
     // =================================================
 
 

@@ -1,8 +1,9 @@
 function LocalStatsManager()
 {
   this.stats_names_and_initials = {
+    'time-game-total'   : 0,
     'moves-total'       : 0,
-    'moves-up'          : 0 ,
+    'moves-up'          : 0,
     'moves-down'        : 0,
     'moves-left'        : 0,
     'moves-right'       : 0,
