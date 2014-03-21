@@ -91,6 +91,11 @@
     <h2>Stats</h2>
     <div class="stats-container">
       <div class="stats-key">
+        Game Time:
+      </div>
+      <div class="stats-value"><span id="stats-time-game-total">0</span>s</div>
+
+      <div class="stats-key">
         Moves Total:
       </div>
       <div id="stats-moves-total" class="stats-value">0</div>
@@ -176,6 +181,8 @@
   </div>
 
   
+  <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/0.2.0/Chart.min.js"></script>
+
   <script src="js/animframe_polyfill.js"></script>
   <script src="js/keyboard_input_manager.js"></script>
   <script src="js/html_actuator.js"></script>
