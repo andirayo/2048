@@ -133,11 +133,42 @@ HTMLActuator.prototype.updateBestScore = function (bestScore) {
 
 HTMLActuator.prototype.updateStats = function(statsManager)
 {
+  var movesTotal    = parseInt(statsManager.get('moves-total'));
+
+  if  (0 < statsManager.get('timestamp-game-start'))
+  {
+    statsManager.set('time-game-total', ((Date.now() - statsManager.get('timestamp-game-start')) / 1000).toFixed(3));
+    statsManager.set('time-move-avg', (statsManager.get('time-game-total') / Math.max(1, movesTotal -1)).toFixed(3));
+  } //if
+
+
+  statsManager.set('tiles-current-pct', (statsManager.get('tiles-current') * 100 / (statsManager.get('game-size') * statsManager.get('game-size'))).toFixed(1));
+  statsManager.set('tiles-avg-pct', (statsManager.get('tiles-avg') * 100 / (statsManager.get('game-size') * statsManager.get('game-size'))).toFixed(1));
+  statsManager.set('newtiles-4-pct', (statsManager.get('newtiles-4') * 100 / (parseInt(statsManager.get('newtiles-2')) + parseInt(statsManager.get('newtiles-4')))).toFixed(0));
+
+  if  (0 < movesTotal)
+  {
+    statsManager.set('moves-nomerge-pct', (statsManager.get('moves-nomerge') * 100 / movesTotal).toFixed(1));
+  } //if
+
+  // -----------------------------------------------------
   for (stats_name in statsManager.stats_names_and_initials)
   {
-    this.statsContainer             = document.querySelector('#stats-' + stats_name);
-    this.clearContainer(this.statsContainer);
-    this.statsContainer.textContent = statsManager.get(stats_name);
+    statsContainer  = document.querySelector('#stats-' + stats_name);
+    if  (statsContainer)
+    {
+      this.clearContainer(statsContainer);
+
+      switch (stats_name)
+      {
+        case 'pos-highest-tile-corner':
+          statsContainer.textContent  = ('1' == statsManager.get(stats_name))  ?  'yes'  :  'no';
+          break;
+
+        default:
+          statsContainer.textContent  = statsManager.get(stats_name);
+      } //switch
+    } //if
   } //for
 };  //updateStats()
 

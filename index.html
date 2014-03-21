@@ -120,8 +120,21 @@
       <div class="stats-key">
         Time per Move:
       </div>
-      <div class="stats-value"><span id="stats-time-move-average">0</span>s</div>
+      <div class="stats-value"><span id="stats-time-move-avg">0</span>s</div>
       
+      <div class="stats-key">
+        Current # Tiles:
+      </div>
+      <div class="stats-value"><span id="stats-tiles-current">0</span> (<span id="stats-tiles-current-pct">0</span>%)</div>
+      <div class="stats-key">
+        Average # Tiles:
+      </div>
+      <div class="stats-value"><span id="stats-tiles-avg">0</span> (<span id="stats-tiles-avg-pct">0</span>%)</div>
+      <div class="stats-key">
+        Highest Tile Corner:
+      </div>
+      <div class="stats-value"><span id="stats-pos-highest-tile-corner">?</span> (<span id="stats-pos-highest-tile-corner-pct">?</span>%)</div>
+
       <div class="stats-key">
         New tiles 2:
       </div>
@@ -129,12 +142,12 @@
       <div class="stats-key">
         New tiles 4:
       </div>
-      <div id="stats-newtiles-4" class="stats-value">0</div>
+      <div class="stats-value"><span id="stats-newtiles-4">0</span> (<span id="stats-newtiles-4-pct">0</span>%)</div>
 
       <div class="stats-key">
         Moves without Merge:
       </div>
-      <div id="stats-moves-nomerge" class="stats-value">0</div>
+      <div class="stats-value"><span id="stats-moves-nomerge">0</span> (<span id="stats-moves-nomerge-pct">0</span>%)</div>
 
       <div class="stats-key">
         Merges Total:
@@ -190,6 +203,8 @@
   </div>
 
   
+  <script type='text/javascript' src='https://cdn.firebase.com/js/client/1.0.6/firebase.js'></script>
+
   <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/0.2.0/Chart.min.js"></script>
 
   <script src="js/animframe_polyfill.js"></script>
