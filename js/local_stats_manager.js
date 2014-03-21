@@ -8,6 +8,8 @@ function LocalStatsManager()
     'moves-left'        : 0,
     'moves-right'       : 0,
     'moves-nomerge'     : 0,
+    'newtiles-2'        : 0,
+    'newtiles-4'        : 0,
     'merges-total'      : 0,
     'merges-4'          : 0,
     'merges-8'          : 0,
@@ -24,7 +26,6 @@ function LocalStatsManager()
     };
 
   this.stats        = new Object();
-
   for (stats_name in this.stats_names_and_initials)
   {
     this.stats[stats_name]  = new LocalScoreManager('stats-' + stats_name);
