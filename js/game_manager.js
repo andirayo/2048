@@ -48,19 +48,24 @@ GameManager.prototype.setup = function () {
   this.timestampLastMove  = false; // Date.now();
   this.timeMoveAverage    = 0;
 
+
+  // very good: http://www.freesound.org/
+  // also good: http://www.freesfx.co.uk/sfx
+  // OGG-conversion: http://media.io/
+  // OGG-conversion: http://audio.online-convert.com/convert-to-ogg
   this.folder_data_audio  = 'data/audio/';
   this.audio_filenames    = {
-       4: 'zipper_with_coins.mp3',
-       8: 'coins_dropping2.mp3',
-      16: 'coin_dropping1.mp3',
-      32: 'checkout.mp3',
-      64: 'charging.mp3',
-     128: 'voice_alright.mp3',
-     256: 'gold_rain.mp3',
-     512: 'voice_halleluja.mp3',
-    1024: 'sirene.mp3',
-    2048: 'slot_machine.mp3',
-    4096: 'dingdingding.mp3',
+       4: 'zipper_with_coins.ogg',
+       8: 'coins_dropping2.ogg',
+      16: 'coin_dropping1.ogg',
+      32: 'checkout.ogg',
+      64: 'charging.ogg',
+     128: 'voice_alright.ogg',
+     256: 'gold_rain.ogg',
+     512: 'voice_halleluja.ogg',
+    1024: 'sirene.ogg',
+    2048: 'slot_machine.ogg',
+    4096: 'dingdingding.ogg',
     };
   this.audio_sounds       = new Object();
   for (key in this.audio_filenames)
@@ -163,8 +168,6 @@ GameManager.prototype.move = function (direction) {
           // ### Statistics ##################################
           self.statsManager.increase('merges-total');
           self.statsManager.increase('merges-' + merged.value);
-          // very good: http://www.freesound.org/
-          // also good: http://www.freesfx.co.uk/sfx
           self.audio_sounds[merged.value].play();
 
 
