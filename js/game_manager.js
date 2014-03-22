@@ -67,13 +67,14 @@ GameManager.prototype.setup = function () {
     2048: 'slot_machine.ogg',
     4096: 'dingdingding.ogg',
     };
-  this.audio_sounds               = new Object();
+  this.audio_sounds                 = new Object();
   for (key in this.audio_filenames)
-    this.audio_sounds[key]        = new Audio( this.folder_data_audio + this.audio_filenames[key] );
+    this.audio_sounds[key]          = new Audio( this.folder_data_audio + this.audio_filenames[key] );
 
-  this.tiles_current              = 0;
-  this.sum_tiles_current          = 0;
-  this.countPosHighestTileCorner  = 0;
+  this.tiles_current                = 0;
+  this.sum_tiles_current            = 0;
+  this.countPosHighestTileCorner    = 0;
+  this.countPosHighestTilesOutside  = 0;
 
   this.statsManager.set('game-size', this.size);
   this.statsManager.set('timestamp-game-start', null);
@@ -84,8 +85,12 @@ GameManager.prototype.setup = function () {
 
   posHighestTileCorner            = (this.statsCheckPositionHightestTileCorner()  ?  1  :  0);
   this.countPosHighestTileCorner  += posHighestTileCorner;
-  this.statsManager.set('pos-highest-tile-corner'    , posHighestTileCorner);
-  this.statsManager.set('pos-highest-tile-corner-pct', (this.countPosHighestTileCorner * 100 / (1 + 0)).toFixed(0));
+  this.statsManager.set('pos-highest-tile-corner'       , posHighestTileCorner);
+  this.statsManager.set('pos-highest-tile-corner-pct'   , (this.countPosHighestTileCorner * 100 / (1 + 0)).toFixed(0));
+  posHighestTilesOutside            = (this.statsCheckPositionHightestTilesOutside()  ?  1  :  0);
+  this.countPosHighestTilesOutside  += posHighestTilesOutside;
+  this.statsManager.set('pos-highest-tiles-outside'     , posHighestTilesOutside);
+  this.statsManager.set('pos-highest-tiles-outside-pct' , (this.countPosHighestTilesOutside * 100 / (1 + 0)).toFixed(0));
 
 
   // Update the actuator
@@ -237,11 +242,14 @@ GameManager.prototype.move = function (direction) {
 
     var movesTotal          = parseInt(this.statsManager.get('moves-total'));
     // -----------------------------------------------------
-    posHighestTileCorner            = (this.statsCheckPositionHightestTileCorner()  ?  1  :  0);
-    this.countPosHighestTileCorner  += posHighestTileCorner;
+    posHighestTileCorner              = (this.statsCheckPositionHightestTileCorner()  ?  1  :  0);
+    this.countPosHighestTileCorner    += posHighestTileCorner;
     this.statsManager.set('pos-highest-tile-corner'    , posHighestTileCorner);
     this.statsManager.set('pos-highest-tile-corner-pct', (this.countPosHighestTileCorner * 100 / (1 + movesTotal)).toFixed(0));
-//alert((this.countPosHighestTileCorner * 100 / (1 + movesTotal)).toFixed(0));
+    posHighestTilesOutside            = (this.statsCheckPositionHightestTilesOutside()  ?  1  :  0);
+    this.countPosHighestTilesOutside  += posHighestTilesOutside;
+    this.statsManager.set('pos-highest-tiles-outside'     , posHighestTilesOutside);
+    this.statsManager.set('pos-highest-tiles-outside-pct' , (this.countPosHighestTilesOutside * 100 / (1 + 0)).toFixed(0));
 
     // -----------------------------------------------------
     this.sum_tiles_current  += this.tiles_current
@@ -316,7 +324,13 @@ GameManager.prototype.statsCheckPositionHightestTileCorner = function()
   }); // forEach traversals.x
   
   return highestValueCorner;
-};
+}; //statsCheckPositionHightestTileCorner
+GameManager.prototype.statsCheckPositionHightestTilesOutside = function()
+{
+  // check top row (y=0)
+  tile = this.grid.cellContent({x:0,y:0});
+}; //statsCheckPositionHightestTilesOutside()
+
 
 // Get the vector representing the chosen direction
 GameManager.prototype.getVector = function (direction) {
