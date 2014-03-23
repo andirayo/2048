@@ -4,6 +4,7 @@ function GameManager(size, InputManager, Actuator, ScoreManager, StatsManager) {
   this.scoreManager = new ScoreManager("bestScore");
   this.actuator     = new Actuator;
   this.statsManager = new StatsManager;
+  this.funStuff     = new FunStuff(this);
 
   this.startTiles   = 2;
 
@@ -42,6 +43,9 @@ GameManager.prototype.setup = function () {
   this.over               = false;
   this.won                = false;
   this.keepPlaying        = false;
+  this.scoreNext1Thousand = 1000;
+  this.scoreNext2Thousand = 2000;
+  this.greatMoveInARowCounter = 0;
 
   // first move is not used for stats
   this.timestampGameStart = false;
@@ -66,6 +70,7 @@ GameManager.prototype.setup = function () {
     1024: 'sirene.ogg',
     2048: 'slot_machine.ogg',
     4096: 'dingdingding.ogg',
+    'toasty': 'toasty.ogg',
     };
   this.audio_sounds                 = new Object();
   for (key in this.audio_filenames)
@@ -188,7 +193,7 @@ GameManager.prototype.move = function (direction) {
   var vector      = this.getVector(direction);
   var traversals  = this.buildTraversals(vector);
   var moved       = false;
-  var tilesMerged = false;
+  var tilesMerged = 0;
 
   // Save the current tile positions and remove merger information
   this.prepareTiles();
@@ -206,10 +211,10 @@ GameManager.prototype.move = function (direction) {
         // Only one merger per row traversal?
         if (next && next.value === tile.value && !next.mergedFrom)
         {
-          var merged  = new Tile(positions.next, tile.value * 2);
+          var merged        = new Tile(positions.next, tile.value * 2);
           merged.mergedFrom = [tile, next];
 
-          tilesMerged = merged.value;
+          tilesMerged       = Math.max(merged.value, tilesMerged);
           // ### Statistics ##################################
           self.statsManager.increase('merges-total');
           self.statsManager.increase('merges-' + merged.value);
@@ -238,9 +243,33 @@ GameManager.prototype.move = function (direction) {
       }
     });
   });
-
   if (moved)
   {
+    // ### Fun Stuff ##################################
+    if  (32 <= tilesMerged)
+      this.greatMoveInARowCounter++;
+    else
+      this.greatMoveInARowCounter = 0;
+
+    if  (3 <= this.greatMoveInARowCounter)
+    {
+      this.funStuff.fun_toasty_slidein();
+    } //if
+
+    if  (this.scoreNext2Thousand < this.score)
+    {
+      this.funStuff.fun_toasty_slidein();
+      this.scoreNext2Thousand += 2000;
+    } //if
+
+    if  (this.scoreNext1Thousand < this.score)
+    {
+      // nothing yet
+      this.scoreNext1Thousand += 1000;
+    } //if
+
+
+    // ### Game ##################################
     this.addRandomTile();
 
     if (!this.movesAvailable()) {
