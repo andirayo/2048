@@ -162,6 +162,7 @@ HTMLActuator.prototype.updateStats = function(statsManager)
       switch (stats_name)
       {
         case 'pos-highest-tile-corner':
+        case 'pos-highest-tiles-outside':
           statsContainer.textContent  = ('1' == statsManager.get(stats_name))  ?  'yes'  :  'no';
           break;
 

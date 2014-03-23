@@ -76,12 +76,38 @@ GameManager.prototype.setup = function () {
   this.countPosHighestTileCorner    = 0;
   this.countPosHighestTilesOutside  = 0;
 
+  this.assumedMaxPossible = 16384;
+  this.gridNumberMax      = 0;
+  this.gridNumberMin      = this.assumedMaxPossible;
+  this.gridNumberCount    = 0;
+  this.gridNumberMaxX     = [];
+  this.gridNumberMinX     = [];
+  this.gridNumberCountX   = [];
+  this.gridNumberMaxY     = [];
+  this.gridNumberMinY     = [];
+  this.gridNumberCountY   = [];
+  this.gridNumbersXY      = [];
+  this.gridNumbersYX      = [];
+  for (var x = 0; x < this.size; x++)
+  {
+    this.gridNumbersXY[x]     = new Array(this.size);
+    this.gridNumbersYX[x]     = new Array(this.size);
+    this.gridNumberMaxX[x]    = 0;
+    this.gridNumberMinX[x]    = this.assumedMaxPossible;
+    this.gridNumberCountX[x]  = 0;
+    this.gridNumberMaxY[x]    = 0;
+    this.gridNumberMinY[x]    = this.assumedMaxPossible;
+    this.gridNumberCountY[x]  = 0;
+  } //for
+
   this.statsManager.set('game-size', this.size);
   this.statsManager.set('timestamp-game-start', null);
 
 
   // Add the initial tiles
   this.addStartTiles();
+
+  this.updateGridNumbers();
 
   posHighestTileCorner            = (this.statsCheckPositionHightestTileCorner()  ?  1  :  0);
   this.countPosHighestTileCorner  += posHighestTileCorner;
@@ -221,6 +247,8 @@ GameManager.prototype.move = function (direction) {
       this.over = true; // Game over!
     }
 
+    this.updateGridNumbers();
+
 
     // ### Statistics ##################################
     this.statsManager.increase('moves-total');
@@ -249,7 +277,7 @@ GameManager.prototype.move = function (direction) {
     posHighestTilesOutside            = (this.statsCheckPositionHightestTilesOutside()  ?  1  :  0);
     this.countPosHighestTilesOutside  += posHighestTilesOutside;
     this.statsManager.set('pos-highest-tiles-outside'     , posHighestTilesOutside);
-    this.statsManager.set('pos-highest-tiles-outside-pct' , (this.countPosHighestTilesOutside * 100 / (1 + 0)).toFixed(0));
+    this.statsManager.set('pos-highest-tiles-outside-pct' , (this.countPosHighestTilesOutside * 100 / (1 + movesTotal)).toFixed(0));
 
     // -----------------------------------------------------
     this.sum_tiles_current  += this.tiles_current
@@ -275,62 +303,82 @@ GameManager.prototype.move = function (direction) {
 };
 GameManager.prototype.statsCheckPositionHightestTileCorner = function()
 {
-  var highestValue        = 0;
-  var highestValueCorner  = false;
-
-  var self        = this;
-  var traversals  = this.buildTraversals( { x: 0,  y: -1 } );
-  traversals.x.forEach(function(x)
-  {
-    traversals.y.forEach(function(y)
-    {
-      cell = { x: x, y: y };
-      tile = self.grid.cellContent(cell);
-
-      // is there a tile in this cell?
-      if (tile)
-      {
-        // is highest value?
-        if  (   (highestValue < tile.value)
-            ||  (   (highestValue == tile.value)
-                &&  (! highestValueCorner)
-                )
-            )
-        {
-          highestValue = tile.value;
-
-          // is in one of the corners?
-          if  (   (   (x == 0)
-                  &&  (y == 0)
-                  )
-              ||  (   (x == 0)
-                  &&  (y == self.size -1)
-                  )
-              ||  (   (x == self.size -1)
-                  &&  (y == 0)
-                  )
-              ||  (   (x == self.size -1)
-                  &&  (y == self.size -1)
-                  )
-              )
-          {
-            highestValueCorner = true;
-          }
-          else
-            highestValueCorner = false;
-        } //if
-      } //if
-    }); // forEach traversals.y
-  }); // forEach traversals.x
-  
-  return highestValueCorner;
+  return  (   (this.gridNumberMax == this.gridNumbersXY[0][0])
+          ||  (this.gridNumberMax == this.gridNumbersXY[0][this.size -1])
+          ||  (this.gridNumberMax == this.gridNumbersXY[this.size -1][0])
+          ||  (this.gridNumberMax == this.gridNumbersXY[this.size -1][this.size -1])
+          );
 }; //statsCheckPositionHightestTileCorner
 GameManager.prototype.statsCheckPositionHightestTilesOutside = function()
 {
-  // check top row (y=0)
-  tile = this.grid.cellContent({x:0,y:0});
+  // the outside traverse in question has to be filled half (at least)
+          // checking the top row
+  return (
+        (   (this.size / 2 <= this.gridNumberCountY[0])
+        &&  (Math.max.apply(Math, this.gridNumberMaxY.slice(1, this.size)) <= this.gridNumberMinY[0])
+        )
+        // checking the bottom row
+    ||  (   (this.size / 2 <= this.gridNumberCountY[this.size -1])
+        &&  (Math.max.apply(Math, this.gridNumberMaxY.slice(0, this.size -1)) <= this.gridNumberMinY[this.size -1])
+        )
+        // checking the left column
+    ||  (   (this.size / 2 <= this.gridNumberCountX[0])
+        &&  (Math.max.apply(Math, this.gridNumberMaxX.slice(1, this.size)) <= this.gridNumberMinX[0])
+        )
+        // checking the bottom row
+    ||  (   (this.size / 2 <= this.gridNumberCountX[this.size -1])
+        &&  (Math.max.apply(Math, this.gridNumberMaxX.slice(0, this.size -1)) <= this.gridNumberMinX[this.size -1])
+        )
+    );
 }; //statsCheckPositionHightestTilesOutside()
 
+GameManager.prototype.updateGridNumbers = function()
+{
+  var self              = this;
+  
+  this.gridNumberMax    = 0;
+  this.gridNumberMin    = this.assumedMaxPossible;
+  this.gridNumberCount  = 0;
+  for (var x = 0; x < this.size; x++)
+  {
+    this.gridNumberMaxX[x]    = 0;
+    this.gridNumberMinX[x]    = this.assumedMaxPossible;
+    this.gridNumberCountX[x]  = 0;
+
+    for (var y = 0; y < this.size; y++)
+    {
+      if  (0 == x)
+      {
+        this.gridNumberMaxY[y]    = 0;
+        this.gridNumberMinY[y]    = this.assumedMaxPossible;
+        this.gridNumberCountY[y]  = 0;
+      } //if
+
+
+      tile  = self.grid.cellContent( {x:x,y:y} );
+      value = tile  ?  tile.value  :  0;
+
+      this.gridNumbersXY[x][y]  = value;
+      this.gridNumbersYX[y][x]  = value;
+
+
+      this.gridNumberMaxX[x]    = Math.max( value, this.gridNumberMaxX[x] );
+      this.gridNumberMaxY[y]    = Math.max( value, this.gridNumberMaxY[y] );
+      this.gridNumberMax        = Math.max( value, this.gridNumberMax );
+
+      if  (tile)
+      {
+        this.gridNumberMinX[x]  = Math.min( value, this.gridNumberMinX[x] );
+        this.gridNumberMinY[y]  = Math.min( value, this.gridNumberMinY[y] );
+        this.gridNumberMin      = Math.min( value, this.gridNumberMin );
+
+        this.gridNumberCountX[x]++;
+        this.gridNumberCountY[y]++;
+        this.gridNumberCount++;
+      } //if
+    } //for
+  } //for
+}; //updateGridNumbers()
 
 // Get the vector representing the chosen direction
 GameManager.prototype.getVector = function (direction) {
